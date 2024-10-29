@@ -1,6 +1,23 @@
 pluginManagement {
-    // Include 'plugins build' to define convention plugins.
     includeBuild("build-logic")
+
+    repositories {
+        gradlePluginPortal()
+        // for detekt snapshot
+        maven {
+            url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        // for detekt snapshot
+        maven {
+            url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+        }
+    }
 }
 
 plugins {
@@ -9,7 +26,7 @@ plugins {
 }
 
 rootProject.name = "leetcode-version-code"
-include("app", "list", "utilities")
+include("version-code")
 
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

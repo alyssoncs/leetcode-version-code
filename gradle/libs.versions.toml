@@ -2,7 +2,32 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin-gradle-plugin = "2.0.0"
+dagp = "2.3.0"
+dependencies-sorter = "0.10"
+detekt = "main-SNAPSHOT"
+java = "21"
+junit = "5.11.2"
+kotest = "6.0.0.M1"
+kotlin = "2.1.0-Beta2"
 
 [libraries]
-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-gradle-plugin" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+test-junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+test-junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+test-junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+test-junit-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+test-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+
+# :build-logic
+dependencies-sorter-gradle-plugin = { module = "com.squareup:sort-dependencies-gradle-plugin", version.ref = "dependencies-sorter" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+dependency-analysis-gradle-plugin = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dagp" }
+
+[plugins]
+dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dagp" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+# convention plugins
+version-code-kotlin-library = { id = "alysson.cirilo.kotlin-library" }

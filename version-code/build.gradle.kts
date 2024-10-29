@@ -5,9 +5,5 @@
  */
 
 plugins {
-    id("buildlogic.kotlin-library-conventions")
-}
-
-dependencies {
-    api(project(":list"))
+    alias(libs.plugins.version.code.kotlin.library)
 }
