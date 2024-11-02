@@ -1,11 +1,11 @@
 package alysson.cirilo.versioncode
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.assertions.throwables.shouldThrowWithMessage
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 
 class VersionCodeTest {
@@ -72,53 +72,86 @@ class VersionCodeTest {
     @Nested
     inner class SegmentRange {
         @ParameterizedTest
-        @IntRangeSource(start = -100, end = -1)
-        @IntRangeSource(start = 32, end = 64)
-        fun `fail on out of range major`(major: Int) {
-            assertThrows<IllegalArgumentException> {
-                version.withMajor(major)
-            }
-        }
-
-        @ParameterizedTest
         @IntRangeSource(start = 0, end = 31)
-        fun `pass on correct range major`(major: Int) {
-            assertDoesNotThrow {
+        fun `pass on major between valid range`(major: Int) {
+            shouldNotThrowAny {
                 version.withMajor(major)
             }
         }
 
         @ParameterizedTest
         @IntRangeSource(start = -100, end = -1)
-        @IntRangeSource(start = 524_288, end = 524_400)
-        fun `fail on out of range minor`(minor: Int) {
-            assertThrows<IllegalArgumentException> {
-                version.withMinor(minor)
+        fun `fail on major below valid range`(major: Int) {
+            shouldThrowWithMessage<IllegalArgumentException>(
+                "Major should not be negative, but is $major",
+            ) {
+                version.withMajor(major)
+            }
+        }
+
+        @ParameterizedTest
+        @IntRangeSource(start = 32, end = 64)
+        fun `fail on major above valid range`(major: Int) {
+            shouldThrowWithMessage<IllegalArgumentException>(
+                "Major should be no more than 31 (2^5-1), but is $major",
+            ) {
+                version.withMajor(major)
             }
         }
 
         @ParameterizedTest
         @IntRangeSource(start = 0, end = 100)
         @IntRangeSource(start = 524_200, end = 524_287)
-        fun `pass on correct range minor`(minor: Int) {
-            assertDoesNotThrow {
+        fun `pass on minor between valid range`(minor: Int) {
+            shouldNotThrowAny {
                 version.withMinor(minor)
             }
         }
 
         @ParameterizedTest
         @IntRangeSource(start = -100, end = -1)
-        @IntRangeSource(start = 128, end = 200)
-        fun `fail on out of range patch`(patch: Int) {
-            assertThrows<IllegalArgumentException> {
-                version.withPatch(patch)
+        fun `fail on minor below valid range`(minor: Int) {
+            shouldThrowWithMessage<IllegalArgumentException>(
+                "Minor should not be negative, but is $minor",
+            ) {
+                version.withMinor(minor)
+            }
+        }
+
+        @ParameterizedTest
+        @IntRangeSource(start = 524_288, end = 524_400)
+        fun `fail on minor above valid range`(minor: Int) {
+            shouldThrowWithMessage<IllegalArgumentException>(
+                "Minor should be no more than 524287 (2^19-1), but is $minor",
+            ) {
+                version.withMinor(minor)
             }
         }
 
         @ParameterizedTest
         @IntRangeSource(start = 0, end = 127)
-        fun `pass on correct range patch`(patch: Int) {
-            assertDoesNotThrow {
+        fun `pass on patch between valid range`(patch: Int) {
+            shouldNotThrowAny {
+                version.withPatch(patch)
+            }
+        }
+
+        @ParameterizedTest
+        @IntRangeSource(start = -100, end = -1)
+        fun `fail on patch below valid range`(patch: Int) {
+            shouldThrowWithMessage<IllegalArgumentException>(
+                "Patch should not be negative, but is $patch",
+            ) {
+                version.withPatch(patch)
+            }
+        }
+
+        @ParameterizedTest
+        @IntRangeSource(start = 128, end = 200)
+        fun `fail on patch above valid range`(patch: Int) {
+            shouldThrowWithMessage<IllegalArgumentException>(
+                "Patch should be no more than 127 (2^7-1), but is $patch",
+            ) {
                 version.withPatch(patch)
             }
         }
