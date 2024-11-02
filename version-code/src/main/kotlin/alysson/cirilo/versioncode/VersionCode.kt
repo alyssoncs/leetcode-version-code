@@ -4,23 +4,18 @@ import kotlin.math.pow
 
 class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<VersionCode> {
     init {
-        require(major in 0..<(2 toThe MAJOR_BITS)) {
-            if (major < 0)
-                "Major should not be negative, but is $major"
+        VersionComponent.entries.forEach(::checkVersionComponent)
+    }
+
+    private fun checkVersionComponent(component: VersionComponent) {
+        val version = component.from(this)
+        require(component.isValid(version)) {
+            val violation = if (version < 0)
+                "not be negative"
             else
-                "Major should be no more than ${(2 toThe MAJOR_BITS) - 1} (2^$MAJOR_BITS-1), but is $major"
-        }
-        require(minor in 0..<(2 toThe MINOR_BITS)) {
-            if (minor < 0)
-                "Minor should not be negative, but is $minor"
-            else
-                "Minor should be no more than ${(2 toThe MINOR_BITS) - 1} (2^$MINOR_BITS-1), but is $minor"
-        }
-        require(patch in 0..<(2 toThe PATCH_BITS)) {
-            if (patch < 0)
-                "Patch should not be negative, but is $patch"
-            else
-                "Patch should be no more than ${(2 toThe PATCH_BITS) - 1} (2^$PATCH_BITS-1), but is $patch"
+                "be no more than ${component.maxValue} (2^${component.bits}-1)"
+
+            "${component.displayName} should $violation, but is $version"
         }
     }
 
@@ -30,8 +25,30 @@ class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<V
         return this.value - other.value
     }
 
-    private infix fun Int.toThe(exponent: Int): Int {
-        return toDouble().pow(exponent).toInt()
+    private enum class VersionComponent(
+        val bits: Int,
+        val displayName: String,
+    ) {
+        MAJOR(MAJOR_BITS, "Major") {
+            override fun from(version: VersionCode): Int = version.major
+        },
+        MINOR(MINOR_BITS, "Minor") {
+            override fun from(version: VersionCode): Int = version.minor
+        },
+        PATCH(PATCH_BITS, "Patch") {
+            override fun from(version: VersionCode): Int = version.patch
+        },
+        ;
+
+        abstract fun from(version: VersionCode): Int
+
+        val maxValue = (2 toThe bits) - 1
+
+        fun isValid(version: Int) = version in 0..maxValue
+
+        private infix fun Int.toThe(exponent: Int): Int {
+            return toDouble().pow(exponent).toInt()
+        }
     }
 
     companion object {

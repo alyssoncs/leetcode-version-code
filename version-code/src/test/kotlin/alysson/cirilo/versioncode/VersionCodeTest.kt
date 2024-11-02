@@ -70,7 +70,7 @@ class VersionCodeTest {
     }
 
     @Nested
-    inner class SegmentRange {
+    inner class ComponentRange {
         @ParameterizedTest
         @IntRangeSource(start = 0, end = 127)
         fun `pass on major between valid range`(major: Int) {
