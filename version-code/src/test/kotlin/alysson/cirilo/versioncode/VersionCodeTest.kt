@@ -34,7 +34,7 @@ class VersionCodeTest {
     inner class Comparison {
 
         @Nested
-        inner class SegmentBump {
+        inner class ComponentBump {
             @Test
             fun `generates greater value for greater patch`() {
                 version.withPatch(version.patch.inc()) shouldBeGreaterThan version
