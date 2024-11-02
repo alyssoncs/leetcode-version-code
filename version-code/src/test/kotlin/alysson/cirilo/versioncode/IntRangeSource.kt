@@ -8,7 +8,7 @@ import java.util.stream.IntStream
 import java.util.stream.Stream
 
 @Repeatable
-@Target(AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 @ArgumentsSource(IntRangeArgumentsProvider::class)
 annotation class IntRangeSource(val start: Int, val end: Int)

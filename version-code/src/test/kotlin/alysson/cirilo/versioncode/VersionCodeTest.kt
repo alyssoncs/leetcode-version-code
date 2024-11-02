@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import kotlin.math.pow
 
 class VersionCodeTest {
     private val version = "1.2.3".toVersionCode()
@@ -72,7 +73,7 @@ class VersionCodeTest {
     @Nested
     inner class ComponentRange {
         @ParameterizedTest
-        @IntRangeSource(start = 0, end = 127)
+        @MajorValidRangeSource
         fun `pass on major between valid range`(major: Int) {
             shouldNotThrowAny {
                 version.withMajor(major)
@@ -100,8 +101,7 @@ class VersionCodeTest {
         }
 
         @ParameterizedTest
-        @IntRangeSource(start = 0, end = 100)
-        @IntRangeSource(start = 524_200, end = 524_287)
+        @MinorValidRangeSource
         fun `pass on minor between valid range`(minor: Int) {
             shouldNotThrowAny {
                 version.withMinor(minor)
@@ -129,7 +129,7 @@ class VersionCodeTest {
         }
 
         @ParameterizedTest
-        @IntRangeSource(start = 0, end = 31)
+        @PatchValidRangeSource
         fun `pass on patch between valid range`(patch: Int) {
             shouldNotThrowAny {
                 version.withPatch(patch)
@@ -155,5 +155,50 @@ class VersionCodeTest {
                 version.withPatch(patch)
             }
         }
+    }
+
+    @Nested
+    inner class Encoding {
+
+        @Nested
+        inner class SimpleEncoding {
+            @ParameterizedTest
+            @PatchValidRangeSource
+            fun `encode patch as the least significant bits`(patch: Int) {
+                val version = "0.0.$patch".toVersionCode()
+
+                version.value shouldBe patch
+            }
+
+            @ParameterizedTest
+            @MinorValidRangeSource
+            fun `encode minor as the bits after patch`(minor: Int) {
+                val version = "0.$minor.0".toVersionCode()
+
+                version.value shouldBe minor * (2 toThe 5)
+            }
+
+            @ParameterizedTest
+            @MajorValidRangeSource
+            fun `encode major as the most significant bits`(major: Int) {
+                val version = "$major.0.0".toVersionCode()
+
+                version.value shouldBe major * (2 toThe 19) * (2 toThe 5)
+            }
+        }
+    }
+
+    @IntRangeSource(start = 0, end = 127)
+    annotation class MajorValidRangeSource
+
+    @IntRangeSource(start = 0, end = 100)
+    @IntRangeSource(start = 524_200, end = 524_287)
+    annotation class MinorValidRangeSource
+
+    @IntRangeSource(start = 0, end = 31)
+    annotation class PatchValidRangeSource
+
+    private infix fun Int.toThe(exponent: Int): Int {
+        return toDouble().pow(exponent).toInt()
     }
 }

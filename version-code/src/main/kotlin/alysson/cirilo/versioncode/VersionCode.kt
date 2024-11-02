@@ -19,7 +19,7 @@ class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<V
         }
     }
 
-    val value: Int = major * MAJOR_WEIGHT + minor * MINOR_WEIGHT + patch * PATCH_WEIGHT
+    val value: Int = (major shl MAJOR_SHIFT) or (minor shl MINOR_SHIFT) or (patch shl PATCH_SHIFT)
 
     override fun compareTo(other: VersionCode): Int {
         return this.value - other.value
@@ -52,13 +52,12 @@ class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<V
     }
 
     companion object {
-        private const val MAJOR_BITS = 7
-        private const val MAJOR_WEIGHT = 10_000
-
-        private const val MINOR_BITS = 19
-        private const val MINOR_WEIGHT = 100
-
         private const val PATCH_BITS = 5
-        private const val PATCH_WEIGHT = 1
+        private const val MINOR_BITS = 19
+        private const val MAJOR_BITS = 7
+
+        private const val PATCH_SHIFT = 0
+        private const val MINOR_SHIFT = PATCH_SHIFT + PATCH_BITS
+        private const val MAJOR_SHIFT = MINOR_SHIFT + MINOR_BITS
     }
 }
