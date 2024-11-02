@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import kotlin.math.pow
 
 class VersionCodeTest {
@@ -184,6 +185,26 @@ class VersionCodeTest {
                 val version = "$major.0.0".toVersionCode()
 
                 version.value shouldBe major * (2 toThe 19) * (2 toThe 5)
+            }
+        }
+
+        @Nested
+        inner class ComplexEncoding {
+            @CsvSource(
+                "0.0.1, 1",
+                "0.1.0, 32",
+                "1.0.0, 16777216",
+                "1.1.1, 16777249",
+                "1.1.2, 16777250",
+                "1.2.1, 16777281",
+                "2.1.1, 33554465",
+                "4.7.20, 67109108",
+            )
+            @ParameterizedTest
+            fun `encode all the components`(stringVersion: String, expectedValue: Int) {
+                val version = stringVersion.toVersionCode()
+
+                version.value shouldBe expectedValue
             }
         }
     }
