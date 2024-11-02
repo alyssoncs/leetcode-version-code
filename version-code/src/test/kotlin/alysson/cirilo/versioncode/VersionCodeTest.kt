@@ -72,7 +72,7 @@ class VersionCodeTest {
     @Nested
     inner class SegmentRange {
         @ParameterizedTest
-        @IntRangeSource(start = 0, end = 31)
+        @IntRangeSource(start = 0, end = 127)
         fun `pass on major between valid range`(major: Int) {
             shouldNotThrowAny {
                 version.withMajor(major)
@@ -90,10 +90,10 @@ class VersionCodeTest {
         }
 
         @ParameterizedTest
-        @IntRangeSource(start = 32, end = 64)
+        @IntRangeSource(start = 128, end = 200)
         fun `fail on major above valid range`(major: Int) {
             shouldThrowWithMessage<IllegalArgumentException>(
-                "Major should be no more than 31 (2^5-1), but is $major",
+                "Major should be no more than 127 (2^7-1), but is $major",
             ) {
                 version.withMajor(major)
             }
@@ -129,7 +129,7 @@ class VersionCodeTest {
         }
 
         @ParameterizedTest
-        @IntRangeSource(start = 0, end = 127)
+        @IntRangeSource(start = 0, end = 31)
         fun `pass on patch between valid range`(patch: Int) {
             shouldNotThrowAny {
                 version.withPatch(patch)
@@ -147,10 +147,10 @@ class VersionCodeTest {
         }
 
         @ParameterizedTest
-        @IntRangeSource(start = 128, end = 200)
+        @IntRangeSource(start = 32, end = 138)
         fun `fail on patch above valid range`(patch: Int) {
             shouldThrowWithMessage<IllegalArgumentException>(
-                "Patch should be no more than 127 (2^7-1), but is $patch",
+                "Patch should be no more than 31 (2^5-1), but is $patch",
             ) {
                 version.withPatch(patch)
             }
