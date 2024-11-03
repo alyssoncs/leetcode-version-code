@@ -19,10 +19,41 @@ class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<V
         }
     }
 
-    val value: Int = (major shl MAJOR_SHIFT) or (minor shl MINOR_SHIFT) or (patch shl PATCH_SHIFT)
+    private val majorBits = Array(MAJOR_BITS) { idx ->
+        major.getBit(MAJOR_BITS, idx)
+    }
+
+    private val minorBits = Array(MINOR_BITS) { idx ->
+        minor.getBit(MINOR_BITS, idx)
+    }
+
+    private val patchBits = Array(PATCH_BITS) { idx ->
+        patch.getBit(PATCH_BITS, idx)
+    }
+
+    private val bits = majorBits + minorBits + patchBits
+
+    private fun Int.getBit(size: Int, index: Int): Boolean {
+        val bit = this shr (size - 1 - index) and 1
+        return bit == 1
+    }
+
+    private fun Array<Boolean>.toInt(): Int {
+        return this
+            .map { bool -> if (bool) 1 else 0 }
+            .foldIndexed(0) { idx, acc, bit ->
+                acc + bit * (2 toThe (lastIndex - idx))
+            }
+    }
+
+    val value: Int = bits.toInt()
 
     override fun compareTo(other: VersionCode): Int {
         return this.value - other.value
+    }
+
+    override fun toString(): String {
+        return "$value ($major.$minor.$patch)"
     }
 
     private enum class VersionComponent(
@@ -45,19 +76,15 @@ class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<V
         val maxValue = (2 toThe bits) - 1
 
         fun isValid(version: Int) = version in 0..maxValue
-
-        private infix fun Int.toThe(exponent: Int): Int {
-            return toDouble().pow(exponent).toInt()
-        }
     }
 
     companion object {
         private const val PATCH_BITS = 5
         private const val MINOR_BITS = 19
         private const val MAJOR_BITS = 7
-
-        private const val PATCH_SHIFT = 0
-        private const val MINOR_SHIFT = PATCH_SHIFT + PATCH_BITS
-        private const val MAJOR_SHIFT = MINOR_SHIFT + MINOR_BITS
     }
+}
+
+private infix fun Int.toThe(exponent: Int): Int {
+    return toDouble().pow(exponent).toInt()
 }
