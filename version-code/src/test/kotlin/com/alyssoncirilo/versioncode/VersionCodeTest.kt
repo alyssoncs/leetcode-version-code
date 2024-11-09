@@ -2,7 +2,9 @@ package com.alyssoncirilo.versioncode
 
 import com.alyssoncirilo.versioncode.VersionCode.Bits.Companion.bits
 import com.alyssoncirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrowWithMessage
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -16,7 +18,8 @@ class VersionCodeTest {
             shouldThrowWithMessage<IllegalArgumentException>(
                 "Schema should not be empty",
             ) {
-                VersionCode.Factory()
+                val empty = emptyArray<VersionCode.ComponentSchema>()
+                VersionCode.Factory(*empty)
             }
         }
 
@@ -167,6 +170,36 @@ class VersionCodeTest {
                 "Expected 8 components, but got 10",
             ) {
                 factory.create(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+            }
+        }
+    }
+
+    @Nested
+    inner class Syntax {
+        @Test
+        fun `should accept components with no name`() {
+            shouldNotThrowAny {
+                VersionCode.Factory(
+                    30.bits,
+                    1.bits,
+                )
+            }
+        }
+
+        @Test
+        fun `should name unnamed components`() {
+            shouldNotThrowAny {
+                val version = VersionCode.Factory(
+                    9.bits,
+                    9.bits,
+                    9.bits,
+                    4.bits,
+                ).create(1, 2, 3, 4)
+
+                version["Component 0"] shouldBe 1
+                version["Component 1"] shouldBe 2
+                version["Component 2"] shouldBe 3
+                version["Component 3"] shouldBe 4
             }
         }
     }

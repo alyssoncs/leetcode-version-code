@@ -1,5 +1,6 @@
 package com.alyssoncirilo.versioncode
 
+import com.alyssoncirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
 import kotlin.math.pow
 
 class VersionCode private constructor(
@@ -58,6 +59,13 @@ class VersionCode private constructor(
     }
 
     class Factory(private vararg val schema: ComponentSchema) {
+
+        constructor(vararg componentBits: Bits) : this(
+            *componentBits.mapIndexed { idx, bits ->
+                "Component $idx" takes bits
+            }.toTypedArray(),
+        )
+
         init {
             validateSchema()
         }
@@ -139,8 +147,7 @@ class VersionCode private constructor(
         }
     }
 
-    @JvmInline
-    value class Bits private constructor(internal val value: Int) {
+    class Bits private constructor(internal val value: Int) {
         companion object {
             val Int.bits: Bits get() = Bits(this)
         }
