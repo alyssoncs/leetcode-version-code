@@ -59,11 +59,11 @@ class VersionCode private constructor(
 
     class Factory(private vararg val schema: ComponentSchema) {
         init {
-            validate()
+            validateSchema()
         }
 
         fun create(vararg values: Int): VersionCode {
-            validateComponentsSize(values)
+            validateComponents(values)
             val components = values.zip(schema).map { (component, componentSchema) ->
                 VersionComponent(
                     displayName = componentSchema.displayName,
@@ -74,7 +74,7 @@ class VersionCode private constructor(
             return VersionCode(components)
         }
 
-        private fun validate() {
+        private fun validateSchema() {
             require(schema.isNotEmpty()) {
                 "Schema should not be empty"
             }
@@ -89,7 +89,7 @@ class VersionCode private constructor(
             }
         }
 
-        private fun validateComponentsSize(values: IntArray) {
+        private fun validateComponents(values: IntArray) {
             require(values.size == schema.size) {
                 if (values.size < schema.size)
                     missingComponentMessage(numberOfMissingComponents = schema.size - values.size)
