@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import kotlin.math.pow
 
-class VersionCodeTest {
+class SemanticVersionCodeTest {
     private val version = "1.2.3".toVersionCode()
 
     @Nested
@@ -38,17 +38,17 @@ class VersionCodeTest {
         inner class ComponentBump {
             @Test
             fun `generates greater value for greater patch`() {
-                version.withPatch(version.patch.inc()) shouldBeGreaterThan version
+                version.bumpPatch() shouldBeGreaterThan version
             }
 
             @Test
             fun `generates greater value for greater minor`() {
-                version.withMinor(version.minor.inc()) shouldBeGreaterThan version
+                version.bumpMinor() shouldBeGreaterThan version
             }
 
             @Test
             fun `generates greater value for greater major`() {
-                version.withMajor(version.major.inc()) shouldBeGreaterThan version
+                version.bumpMajor() shouldBeGreaterThan version
             }
         }
 
