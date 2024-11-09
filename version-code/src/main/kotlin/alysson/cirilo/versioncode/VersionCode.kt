@@ -20,21 +20,25 @@ class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<V
     }
 
     private val majorBits = Array(MAJOR_BITS) { idx ->
-        major.getBit(MAJOR_BITS, idx)
+        major.getComponentBit(MAJOR_BITS, idx)
     }
 
     private val minorBits = Array(MINOR_BITS) { idx ->
-        minor.getBit(MINOR_BITS, idx)
+        minor.getComponentBit(MINOR_BITS, idx)
     }
 
     private val patchBits = Array(PATCH_BITS) { idx ->
-        patch.getBit(PATCH_BITS, idx)
+        patch.getComponentBit(PATCH_BITS, idx)
     }
 
     private val bits = majorBits + minorBits + patchBits
 
-    private fun Int.getBit(size: Int, index: Int): Boolean {
-        val bit = this shr (size - 1 - index) and 1
+    private fun Int.getComponentBit(componentSize: Int, idx: Int): Boolean {
+        return this[Int.SIZE_BITS - (componentSize - idx)]
+    }
+
+    private operator fun Int.get(index: Int): Boolean {
+        val bit = this shr (Int.SIZE_BITS - index - 1) and 1
         return bit == 1
     }
 
