@@ -1,5 +1,8 @@
 package alysson.cirilo.versioncode
 
+import alysson.cirilo.versioncode.VersionCode.Bits.Companion.bits
+import alysson.cirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
+
 fun String.toVersionCode(): SemanticVersionCode {
     val (major, minor, patch) = this.split(".").map(String::toInt)
     return SemanticVersionCode(major, minor, patch)
@@ -30,16 +33,12 @@ fun SemanticVersionCode.withMajor(major: Int): SemanticVersionCode {
 }
 
 class SemanticVersionCode(major: Int, minor: Int, patch: Int) : Comparable<SemanticVersionCode> {
-    private val versionCode = VersionCode(
-        schema = listOf(
-            MAJOR_NAME to MAJOR_BITS,
-            MINOR_NAME to MINOR_BITS,
-            PATCH_NAME to PATCH_BITS,
-        ),
-        major,
-        minor,
-        patch,
+    private val factory = VersionCode.Factory(
+        MAJOR_NAME takes MAJOR_BITS,
+        MINOR_NAME takes MINOR_BITS,
+        PATCH_NAME takes PATCH_BITS,
     )
+    private val versionCode = factory.create(major, minor, patch)
 
     override fun compareTo(other: SemanticVersionCode): Int = this.versionCode.compareTo(other.versionCode)
 
@@ -51,9 +50,9 @@ class SemanticVersionCode(major: Int, minor: Int, patch: Int) : Comparable<Seman
     val patch = versionCode[PATCH_NAME]!!
 
     companion object {
-        private const val MAJOR_BITS = 7
-        private const val MINOR_BITS = 19
-        private const val PATCH_BITS = 5
+        private val MAJOR_BITS = 7.bits
+        private val MINOR_BITS = 19.bits
+        private val PATCH_BITS = 5.bits
 
         private const val MAJOR_NAME = "Major"
         private const val MINOR_NAME = "Minor"

@@ -2,14 +2,9 @@ package alysson.cirilo.versioncode
 
 import kotlin.math.pow
 
-class VersionCode(
-    schema: List<Pair<String, Int>>,
-    vararg values: Int,
+class VersionCode private constructor(
+    private val components: List<VersionComponent>,
 ) : Comparable<VersionCode> {
-
-    private val components = values.zip(schema).map { (component, componentSchema) ->
-        VersionComponent(displayName = componentSchema.first, bits = componentSchema.second, value = component)
-    }
 
     init {
         components.forEach(::checkVersionComponent)
@@ -59,6 +54,32 @@ class VersionCode(
 
         private infix fun Int.toThe(exponent: Int): Int {
             return toDouble().pow(exponent).toInt()
+        }
+    }
+
+    class Factory(private vararg val schema: ComponentSchema) {
+        fun create(vararg values: Int): VersionCode {
+            val components = values.zip(schema).map { (component, componentSchema) ->
+                VersionComponent(
+                    displayName = componentSchema.displayName,
+                    bits = componentSchema.bits.value,
+                    value = component,
+                )
+            }
+            return VersionCode(components)
+        }
+    }
+
+    class ComponentSchema private constructor(internal val displayName: String, internal val bits: Bits) {
+        companion object {
+            infix fun String.takes(bits: Bits): ComponentSchema = ComponentSchema(displayName = this, bits = bits)
+        }
+    }
+
+    @JvmInline
+    value class Bits private constructor(internal val value: Int) {
+        companion object {
+            val Int.bits: Bits get() = Bits(this)
         }
     }
 }
