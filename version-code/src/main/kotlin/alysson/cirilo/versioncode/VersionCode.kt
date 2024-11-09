@@ -2,46 +2,57 @@ package alysson.cirilo.versioncode
 
 import kotlin.math.pow
 
-class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<VersionCode> {
-    init {
-        VersionComponent.entries.forEach(::checkVersionComponent)
+class VersionCode(
+    schema: List<Pair<String, Int>>,
+    vararg values: Int,
+) : Comparable<VersionCode> {
+
+    private val components = values.zip(schema).map { (component, componentSchema) ->
+        VersionComponent(displayName = componentSchema.first, bits = componentSchema.second, value = component)
     }
 
-    private fun checkVersionComponent(component: VersionComponent) {
-        val version = component.from(this)
-        require(component.isValid(version)) {
-            val violation = if (version < 0)
-                "not be negative"
-            else
-                "be no more than ${component.maxValue} (2^${component.bits}-1)"
+    init {
+        components.forEach(::checkVersionComponent)
+    }
 
-            "${component.displayName} should $violation, but is $version"
+    val value: Int = run {
+        val reversedComponents = components.reversed()
+        val shifts = reversedComponents.scan(0) { acc, component ->
+            acc + component.bits
+        }
+        reversedComponents.zip(shifts).fold(0) { acc, (component, shift) ->
+            acc or (component.value shl shift)
         }
     }
-
-    val value: Int = (major shl MAJOR_SHIFT) or (minor shl MINOR_SHIFT) or (patch shl PATCH_SHIFT)
 
     override fun compareTo(other: VersionCode): Int {
         return this.value - other.value
     }
 
-    private enum class VersionComponent(
-        val bits: Int,
+    override fun toString(): String {
+        return "$value (${components.joinToString(separator = ".") { it.value.toString() }})"
+    }
+
+    operator fun get(component: String): Int? {
+        return components.firstOrNull { it.displayName == component }?.value
+    }
+
+    private fun checkVersionComponent(component: VersionComponent) {
+        require(component.isValid(component.value)) {
+            val violation = if (component.value < 0)
+                "not be negative"
+            else
+                "be no more than ${component.maxValue} (2^${component.bits}-1)"
+
+            "${component.displayName} should $violation, but is ${component.value}"
+        }
+    }
+
+    private class VersionComponent(
         val displayName: String,
+        val bits: Int,
+        val value: Int,
     ) {
-        MAJOR(MAJOR_BITS, "Major") {
-            override fun from(version: VersionCode): Int = version.major
-        },
-        MINOR(MINOR_BITS, "Minor") {
-            override fun from(version: VersionCode): Int = version.minor
-        },
-        PATCH(PATCH_BITS, "Patch") {
-            override fun from(version: VersionCode): Int = version.patch
-        },
-        ;
-
-        abstract fun from(version: VersionCode): Int
-
         val maxValue = (2 toThe bits) - 1
 
         fun isValid(version: Int) = version in 0..maxValue
@@ -49,15 +60,5 @@ class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<V
         private infix fun Int.toThe(exponent: Int): Int {
             return toDouble().pow(exponent).toInt()
         }
-    }
-
-    companion object {
-        private const val PATCH_BITS = 5
-        private const val MINOR_BITS = 19
-        private const val MAJOR_BITS = 7
-
-        private const val PATCH_SHIFT = 0
-        private const val MINOR_SHIFT = PATCH_SHIFT + PATCH_BITS
-        private const val MAJOR_SHIFT = MINOR_SHIFT + MINOR_BITS
     }
 }
