@@ -8,7 +8,7 @@ class VersionCode private constructor(
 ) : Comparable<VersionCode> {
 
     init {
-        components.forEach(::checkVersionComponent)
+        validate()
     }
 
     val value: Int = run {
@@ -31,6 +31,10 @@ class VersionCode private constructor(
 
     operator fun get(component: String): Int? {
         return components.firstOrNull { it.displayName == component }?.value
+    }
+
+    private fun validate() {
+        components.forEach(::checkVersionComponent)
     }
 
     private fun checkVersionComponent(component: VersionComponent) {
