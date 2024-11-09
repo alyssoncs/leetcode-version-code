@@ -188,19 +188,17 @@ class VersionCodeTest {
 
         @Test
         fun `should name unnamed components`() {
-            shouldNotThrowAny {
-                val version = VersionCode.Factory(
-                    9.bits,
-                    9.bits,
-                    9.bits,
-                    4.bits,
-                ).create(1, 2, 3, 4)
+            val version = VersionCode.Factory(
+                9.bits,
+                9.bits,
+                9.bits,
+                4.bits,
+            ).create(1, 2, 3, 4)
 
-                version["Component 0"] shouldBe 1
-                version["Component 1"] shouldBe 2
-                version["Component 2"] shouldBe 3
-                version["Component 3"] shouldBe 4
-            }
+            version["Component 0"] shouldBe 1
+            version["Component 1"] shouldBe 2
+            version["Component 2"] shouldBe 3
+            version["Component 3"] shouldBe 4
         }
     }
 }
