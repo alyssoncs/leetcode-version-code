@@ -1,7 +1,7 @@
-package alysson.cirilo.versioncode
+package com.alyssoncirilo.versioncode
 
-import alysson.cirilo.versioncode.VersionCode.Bits.Companion.bits
-import alysson.cirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
+import com.alyssoncirilo.versioncode.VersionCode.Bits.Companion.bits
+import com.alyssoncirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
 
 fun String.toSemanticVersion(): SemanticVersion {
     val (major, minor, patch) = this.split(".").map(String::toInt)

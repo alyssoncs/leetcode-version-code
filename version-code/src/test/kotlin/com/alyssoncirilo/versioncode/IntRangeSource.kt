@@ -1,4 +1,4 @@
-package alysson.cirilo.versioncode
+package com.alyssoncirilo.versioncode
 
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.provider.AnnotationBasedArgumentsProvider

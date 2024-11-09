@@ -1,7 +1,7 @@
 import com.autonomousapps.DependencyAnalysisSubExtension
 
 plugins {
-    id("alysson.cirilo.detekt")
+    id("com.alyssoncirilo.detekt")
     id("com.squareup.sort-dependencies")
     id("com.autonomousapps.dependency-analysis")
 }

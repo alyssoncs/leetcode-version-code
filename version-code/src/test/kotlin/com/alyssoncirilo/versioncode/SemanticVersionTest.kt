@@ -1,4 +1,4 @@
-package alysson.cirilo.versioncode
+package com.alyssoncirilo.versioncode
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrowWithMessage

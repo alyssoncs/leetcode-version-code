@@ -30,4 +30,4 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 
 # convention plugins
-version-code-kotlin-library = { id = "alysson.cirilo.kotlin-library" }
+version-code-kotlin-library = { id = "com.alyssoncirilo.kotlin-library" }

@@ -1,4 +1,4 @@
-package alysson.cirilo.versioncode
+package com.alyssoncirilo.versioncode
 
 import kotlin.math.pow
 

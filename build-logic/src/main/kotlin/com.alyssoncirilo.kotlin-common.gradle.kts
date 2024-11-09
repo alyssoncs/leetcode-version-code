@@ -1,13 +1,13 @@
-import alysson.cirilo.versioncode.utils.getIntVersion
-import alysson.cirilo.versioncode.utils.getLibrary
-import alysson.cirilo.versioncode.utils.getVersion
-import alysson.cirilo.versioncode.utils.libs
+import com.alyssoncirilo.versioncode.utils.getIntVersion
+import com.alyssoncirilo.versioncode.utils.getLibrary
+import com.alyssoncirilo.versioncode.utils.getVersion
+import com.alyssoncirilo.versioncode.utils.libs
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
     id("org.jetbrains.kotlin.jvm")
-    id("alysson.cirilo.quality")
+    id("com.alyssoncirilo.quality")
 }
 
 kotlin.jvmToolchain(libs.getIntVersion("java"))

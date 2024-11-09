@@ -1,5 +1,5 @@
-import alysson.cirilo.versioncode.utils.libs
-import alysson.cirilo.versioncode.utils.getLibrary
+import com.alyssoncirilo.versioncode.utils.libs
+import com.alyssoncirilo.versioncode.utils.getLibrary
 
 plugins {
     id("io.gitlab.arturbosch.detekt")
