@@ -58,7 +58,12 @@ class VersionCode private constructor(
     }
 
     class Factory(private vararg val schema: ComponentSchema) {
+        init {
+            validate()
+        }
+
         fun create(vararg values: Int): VersionCode {
+            validateComponentsSize(values)
             val components = values.zip(schema).map { (component, componentSchema) ->
                 VersionComponent(
                     displayName = componentSchema.displayName,
@@ -68,9 +73,67 @@ class VersionCode private constructor(
             }
             return VersionCode(components)
         }
+
+        private fun validate() {
+            require(schema.isNotEmpty()) {
+                "Schema should not be empty"
+            }
+
+            val componentsTotalSize = schema.sumOf { it.bits.value }
+            require(componentsTotalSize < Int.SIZE_BITS) {
+                "All components combined should not take more than 31 bits, but total is $componentsTotalSize"
+            }
+
+            require(schema.size == schema.distinctBy { it.displayName }.size) {
+                "No component should have duplicate names"
+            }
+        }
+
+        private fun validateComponentsSize(values: IntArray) {
+            require(values.size == schema.size) {
+                if (values.size < schema.size)
+                    missingComponentMessage(numberOfMissingComponents = schema.size - values.size)
+                else
+                    tooManyComponentsMessage(values.size)
+            }
+        }
+
+        private fun tooManyComponentsMessage(componentsSize: Int): String {
+            return "Expected ${schema.size} components, but got $componentsSize"
+        }
+
+        private fun missingComponentMessage(numberOfMissingComponents: Int): String {
+            return "Missing value for: ${missingComponentsString(numberOfMissingComponents)}"
+        }
+
+        private fun missingComponentsString(numberOfMissingComponents: Int): String {
+            val missingComponents = schema.takeLast(numberOfMissingComponents)
+            val lastMissing = missingComponents.last()
+            return if (missingComponents.size == 1) {
+                lastMissing.displayName
+            } else {
+                "${
+                    missingComponents.dropLast(1).joinToString(separator = ", ") { it.displayName }
+                } and ${lastMissing.displayName}"
+            }
+        }
     }
 
     class ComponentSchema private constructor(internal val displayName: String, internal val bits: Bits) {
+        init {
+            validate()
+        }
+
+        private fun validate() {
+            require(bits.value >= 0) {
+                "No component should have negative size, but $displayName is ${bits.value}"
+            }
+
+            require(bits.value != 0) {
+                "All components should have positive sizes, but $displayName is zero"
+            }
+        }
+
         companion object {
             infix fun String.takes(bits: Bits): ComponentSchema = ComponentSchema(displayName = this, bits = bits)
         }
