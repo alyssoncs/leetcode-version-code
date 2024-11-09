@@ -10,8 +10,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import kotlin.math.pow
 
-class SemanticVersionCodeTest {
-    private val version = "1.2.3".toVersionCode()
+class SemanticVersionTest {
+    private val version = "1.2.3".toSemanticVersion()
 
     @Nested
     inner class Retrieval {
@@ -166,7 +166,7 @@ class SemanticVersionCodeTest {
             @ParameterizedTest
             @PatchValidRangeSource
             fun `encode patch as the least significant bits`(patch: Int) {
-                val version = "0.0.$patch".toVersionCode()
+                val version = "0.0.$patch".toSemanticVersion()
 
                 version.value shouldBe patch
             }
@@ -174,7 +174,7 @@ class SemanticVersionCodeTest {
             @ParameterizedTest
             @MinorValidRangeSource
             fun `encode minor as the bits after patch`(minor: Int) {
-                val version = "0.$minor.0".toVersionCode()
+                val version = "0.$minor.0".toSemanticVersion()
 
                 version.value shouldBe minor * (2 toThe 5)
             }
@@ -182,7 +182,7 @@ class SemanticVersionCodeTest {
             @ParameterizedTest
             @MajorValidRangeSource
             fun `encode major as the most significant bits`(major: Int) {
-                val version = "$major.0.0".toVersionCode()
+                val version = "$major.0.0".toSemanticVersion()
 
                 version.value shouldBe major * (2 toThe 19) * (2 toThe 5)
             }
@@ -202,7 +202,7 @@ class SemanticVersionCodeTest {
             )
             @ParameterizedTest
             fun `encode all the components`(stringVersion: String, expectedValue: Int) {
-                val version = stringVersion.toVersionCode()
+                val version = stringVersion.toSemanticVersion()
 
                 version.value shouldBe expectedValue
             }

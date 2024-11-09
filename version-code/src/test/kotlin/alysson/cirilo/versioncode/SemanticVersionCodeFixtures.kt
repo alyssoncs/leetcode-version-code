@@ -3,36 +3,36 @@ package alysson.cirilo.versioncode
 import alysson.cirilo.versioncode.VersionCode.Bits.Companion.bits
 import alysson.cirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
 
-fun String.toVersionCode(): SemanticVersionCode {
+fun String.toSemanticVersion(): SemanticVersion {
     val (major, minor, patch) = this.split(".").map(String::toInt)
-    return SemanticVersionCode(major, minor, patch)
+    return SemanticVersion(major, minor, patch)
 }
 
-fun SemanticVersionCode.bumpPatch(): SemanticVersionCode {
+fun SemanticVersion.bumpPatch(): SemanticVersion {
     return withPatch(patch.inc())
 }
 
-fun SemanticVersionCode.withPatch(patch: Int): SemanticVersionCode {
-    return SemanticVersionCode(major = major, minor = minor, patch = patch)
+fun SemanticVersion.withPatch(patch: Int): SemanticVersion {
+    return SemanticVersion(major = major, minor = minor, patch = patch)
 }
 
-fun SemanticVersionCode.bumpMinor(): SemanticVersionCode {
+fun SemanticVersion.bumpMinor(): SemanticVersion {
     return withMinor(minor.inc())
 }
 
-fun SemanticVersionCode.withMinor(minor: Int): SemanticVersionCode {
-    return SemanticVersionCode(major = major, minor = minor, patch = patch)
+fun SemanticVersion.withMinor(minor: Int): SemanticVersion {
+    return SemanticVersion(major = major, minor = minor, patch = patch)
 }
 
-fun SemanticVersionCode.bumpMajor(): SemanticVersionCode {
+fun SemanticVersion.bumpMajor(): SemanticVersion {
     return withMajor(major.inc())
 }
 
-fun SemanticVersionCode.withMajor(major: Int): SemanticVersionCode {
-    return SemanticVersionCode(major = major, minor = minor, patch = patch)
+fun SemanticVersion.withMajor(major: Int): SemanticVersion {
+    return SemanticVersion(major = major, minor = minor, patch = patch)
 }
 
-class SemanticVersionCode(major: Int, minor: Int, patch: Int) : Comparable<SemanticVersionCode> {
+class SemanticVersion(major: Int, minor: Int, patch: Int) : Comparable<SemanticVersion> {
     private val factory = VersionCode.Factory(
         MAJOR_NAME takes MAJOR_BITS,
         MINOR_NAME takes MINOR_BITS,
@@ -40,7 +40,7 @@ class SemanticVersionCode(major: Int, minor: Int, patch: Int) : Comparable<Seman
     )
     private val versionCode = factory.create(major, minor, patch)
 
-    override fun compareTo(other: SemanticVersionCode): Int = this.versionCode.compareTo(other.versionCode)
+    override fun compareTo(other: SemanticVersion): Int = this.versionCode.compareTo(other.versionCode)
 
     override fun toString(): String = versionCode.toString()
 
