@@ -8,30 +8,6 @@ fun String.toSemanticVersion(): SemanticVersion {
     return SemanticVersion(major, minor, patch)
 }
 
-fun SemanticVersion.bumpPatch(): SemanticVersion {
-    return withPatch(patch.inc())
-}
-
-fun SemanticVersion.withPatch(patch: Int): SemanticVersion {
-    return SemanticVersion(major = major, minor = minor, patch = patch)
-}
-
-fun SemanticVersion.bumpMinor(): SemanticVersion {
-    return withMinor(minor.inc())
-}
-
-fun SemanticVersion.withMinor(minor: Int): SemanticVersion {
-    return SemanticVersion(major = major, minor = minor, patch = patch)
-}
-
-fun SemanticVersion.bumpMajor(): SemanticVersion {
-    return withMajor(major.inc())
-}
-
-fun SemanticVersion.withMajor(major: Int): SemanticVersion {
-    return SemanticVersion(major = major, minor = minor, patch = patch)
-}
-
 class SemanticVersion(major: Int, minor: Int, patch: Int) : Comparable<SemanticVersion> {
     private val factory = VersionCode.Factory(
         MAJOR_NAME takes MAJOR_BITS,
@@ -48,6 +24,30 @@ class SemanticVersion(major: Int, minor: Int, patch: Int) : Comparable<SemanticV
     val major = versionCode[MAJOR_NAME]!!
     val minor = versionCode[MINOR_NAME]!!
     val patch = versionCode[PATCH_NAME]!!
+
+    fun bumpPatch(): SemanticVersion {
+        return withPatch(patch.inc())
+    }
+
+    fun withPatch(patch: Int): SemanticVersion {
+        return SemanticVersion(major = major, minor = minor, patch = patch)
+    }
+
+    fun bumpMinor(): SemanticVersion {
+        return withMinor(minor.inc())
+    }
+
+    fun withMinor(minor: Int): SemanticVersion {
+        return SemanticVersion(major = major, minor = minor, patch = patch)
+    }
+
+    fun bumpMajor(): SemanticVersion {
+        return withMajor(major.inc())
+    }
+
+    fun withMajor(major: Int): SemanticVersion {
+        return SemanticVersion(major = major, minor = minor, patch = patch)
+    }
 
     companion object {
         private val MAJOR_BITS = 7.bits
