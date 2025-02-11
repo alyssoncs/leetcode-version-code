@@ -2,7 +2,6 @@ package com.alyssoncirilo.versioncode
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrowWithMessage
-import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -35,20 +34,38 @@ class SemanticVersionTest {
     inner class Comparison {
 
         @Nested
+        inner class Equality {
+            @Test
+            fun `same instance compares equal`() {
+                comparisonChecks(version, "==", version)
+            }
+
+            @Test
+            fun `same value compares equal`() {
+                comparisonChecks(version, "==", version.copy())
+            }
+
+            @Test
+            fun `different version compares different`() {
+                comparisonChecks(version, "!=", version.bumpMajor())
+            }
+        }
+
+        @Nested
         inner class ComponentBump {
             @Test
             fun `generates greater value for greater patch`() {
-                version.bumpPatch() shouldBeGreaterThan version
+                comparisonChecks(version.bumpPatch(), ">", version)
             }
 
             @Test
             fun `generates greater value for greater minor`() {
-                version.bumpMinor() shouldBeGreaterThan version
+                comparisonChecks(version.bumpMinor(), ">", version)
             }
 
             @Test
             fun `generates greater value for greater major`() {
-                version.bumpMajor() shouldBeGreaterThan version
+                comparisonChecks(version.bumpMajor(), ">", version)
             }
         }
 
@@ -56,17 +73,17 @@ class SemanticVersionTest {
         inner class RelativeSignificance {
             @Test
             fun `minor trumps over patch`() {
-                version.withMinor(3) shouldBeGreaterThan version.withPatch(20)
+                comparisonChecks(version.withMinor(3), ">", version.withPatch(20))
             }
 
             @Test
             fun `major trumps over patch`() {
-                version.withMajor(2) shouldBeGreaterThan version.withPatch(20)
+                comparisonChecks(version.withMajor(2), ">", version.withPatch(20))
             }
 
             @Test
             fun `major trumps over minor`() {
-                version.withMajor(2) shouldBeGreaterThan version.withMinor(20)
+                comparisonChecks(version.withMajor(2), ">", version.withMinor(20))
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.alyssoncirilo.versioncode
 
 import com.alyssoncirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
+import kotlin.math.max
 import kotlin.math.pow
 
 class VersionCode private constructor(
@@ -21,8 +22,20 @@ class VersionCode private constructor(
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (other !is VersionCode) return false
+
+        return this.compareTo(other) == 0
+    }
+
+    override fun hashCode(): Int {
+        return components.hashCode()
+    }
+
     override fun compareTo(other: VersionCode): Int {
-        return this.value - other.value
+        val idx = indexOfMostSignificantDifferentComponent(other)
+
+        return this.componentValue(idx) - other.componentValue(idx)
     }
 
     override fun toString(): String {
@@ -48,7 +61,21 @@ class VersionCode private constructor(
         }
     }
 
-    private class VersionComponent(
+    private fun indexOfMostSignificantDifferentComponent(other: VersionCode): Int {
+        val lastIndex = max(this.components.lastIndex, other.components.lastIndex)
+        for (i in 0..lastIndex) {
+            val areComponentsDifferent = this.componentValue(i) != other.componentValue(i)
+            if (areComponentsDifferent || i == lastIndex) return i
+        }
+
+        return lastIndex
+    }
+
+    private fun componentValue(idx: Int): Int {
+        return this.components.getOrNull(idx)?.value ?: 0
+    }
+
+    private data class VersionComponent(
         val displayName: String,
         val bits: Int,
         val value: Int,
@@ -153,7 +180,8 @@ class VersionCode private constructor(
 
     class Bits private constructor(internal val value: Int) {
         companion object {
-            val Int.bits: Bits get() = Bits(this)
+            val Int.bits: Bits get() = bit
+            val Int.bit: Bits get() = Bits(this)
         }
     }
 }

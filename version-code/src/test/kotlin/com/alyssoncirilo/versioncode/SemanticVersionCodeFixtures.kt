@@ -20,6 +20,17 @@ class SemanticVersion(major: Int, minor: Int, patch: Int) : Comparable<SemanticV
 
     override fun toString(): String = versionCode.toString()
 
+    override fun equals(other: Any?): Boolean {
+        if (other is SemanticVersion) return versionCode == other.versionCode
+        if (other is VersionCode) return versionCode == other
+
+        return false
+    }
+
+    override fun hashCode(): Int {
+        return versionCode.hashCode()
+    }
+
     val value = versionCode.value
     val major = versionCode[MAJOR_NAME]!!
     val minor = versionCode[MINOR_NAME]!!
@@ -47,6 +58,10 @@ class SemanticVersion(major: Int, minor: Int, patch: Int) : Comparable<SemanticV
 
     fun withMajor(major: Int): SemanticVersion {
         return SemanticVersion(major = major, minor = minor, patch = patch)
+    }
+
+    fun copy(): SemanticVersion {
+        return SemanticVersion(major, minor, patch)
     }
 
     companion object {

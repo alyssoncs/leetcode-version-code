@@ -1,13 +1,16 @@
 package com.alyssoncirilo.versioncode
 
+import com.alyssoncirilo.versioncode.VersionCode.Bits.Companion.bit
 import com.alyssoncirilo.versioncode.VersionCode.Bits.Companion.bits
 import com.alyssoncirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrowWithMessage
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class VersionCodeTest {
@@ -199,6 +202,94 @@ class VersionCodeTest {
             version["Component 1"] shouldBe 2
             version["Component 2"] shouldBe 3
             version["Component 3"] shouldBe 4
+        }
+    }
+
+    @Nested
+    inner class DifferentSchemaComparison {
+        @Nested
+        inner class SameSchemaSize {
+            @ParameterizedTest
+            @ValueSource(strings = ["5.2", "6.0", "2.5"])
+            fun `should compare equals if the version reads the same`(versionStr: String) {
+                val firstFactory = VersionCode.Factory(3.bits, 3.bits)
+                val secondFactory = VersionCode.Factory(4.bit, 4.bits)
+
+                val firstVersion = versionStr.toVersionCode(firstFactory)
+                val secondVersion = versionStr.toVersionCode(secondFactory)
+
+                firstVersion.value shouldNotBe secondVersion.value
+                return comparisonChecks(firstVersion, "==", secondVersion)
+            }
+
+            @ParameterizedTest
+            @CsvSource(
+                "1.2.3, <, 2.2.3",
+                "1.2.3, >, 1.1.3",
+                "1.2.3, <, 1.2.4",
+                "2.2.3, >, 2.2.2",
+            )
+            fun `should not compare equals if the version does not read the same`(
+                firstVersionStr: String,
+                relationship: String,
+                secondVersionStr: String,
+            ) {
+                val firstFactory = VersionCode.Factory(5.bits, 5.bits, 5.bits)
+                val secondFactory = VersionCode.Factory(4.bit, 6.bits, 7.bits)
+
+                val firstVersion = firstVersionStr.toVersionCode(firstFactory)
+                val secondVersion = secondVersionStr.toVersionCode(secondFactory)
+
+                comparisonChecks(firstVersion, relationship, secondVersion)
+            }
+        }
+
+        @Nested
+        inner class DifferentSchemaSize {
+            @Test
+            fun `should compare different even with same internal representation`() {
+                val singleComponentFactory = VersionCode.Factory(31.bits)
+                val doubleComponentFactory = VersionCode.Factory(1.bit, 30.bits)
+
+                val singleComponentVersion = singleComponentFactory.create(5)
+                val doubleComponentVersion = doubleComponentFactory.create(0, 5)
+
+                singleComponentVersion.value shouldBe doubleComponentVersion.value shouldBe 5
+                comparisonChecks(singleComponentVersion, "!=", doubleComponentVersion)
+            }
+
+            @ParameterizedTest
+            @CsvSource(
+                "5, 5.0",
+                "1.2, 1.2.0",
+                "1.2, 1.2.0.0.0",
+                "0.1.2, 0.1.2.0.0.0",
+            )
+            fun `should compare equals if versions are the same when zero-padded`(
+                firstVersionStr: String,
+                secondVersionStr: String,
+            ) {
+                fun String.factory(): VersionCode.Factory {
+                    val componentSize = count { it == '.' }.inc()
+                    val schema = Array(componentSize) {
+                        (31 / componentSize).bits
+                    }
+                    return VersionCode.Factory(*schema)
+                }
+
+                val firstVersion = firstVersionStr.toVersionCode(firstVersionStr.factory())
+                val secondVersion = secondVersionStr.toVersionCode(secondVersionStr.factory())
+
+                comparisonChecks(firstVersion, "==", secondVersion)
+            }
+        }
+
+        private fun String.toVersionCode(factory: VersionCode.Factory): VersionCode {
+            val components = this.split(".")
+                .map { it.toInt() }
+                .toIntArray()
+
+            return factory.create(*components)
         }
     }
 }
