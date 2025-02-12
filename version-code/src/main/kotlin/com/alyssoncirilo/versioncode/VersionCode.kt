@@ -29,7 +29,7 @@ class VersionCode private constructor(
     }
 
     override fun hashCode(): Int {
-        return components.hashCode()
+        return (components.map { it.value } + List(31 - components.size) { 0 }).hashCode()
     }
 
     override fun compareTo(other: VersionCode): Int {

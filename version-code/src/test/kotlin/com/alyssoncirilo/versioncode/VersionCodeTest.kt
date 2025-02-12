@@ -219,7 +219,7 @@ class VersionCodeTest {
                 val secondVersion = versionStr.toVersionCode(secondFactory)
 
                 firstVersion.value shouldNotBe secondVersion.value
-                return comparisonChecks(firstVersion, "==", secondVersion)
+                comparisonChecks(firstVersion, "==", secondVersion)
             }
 
             @ParameterizedTest
