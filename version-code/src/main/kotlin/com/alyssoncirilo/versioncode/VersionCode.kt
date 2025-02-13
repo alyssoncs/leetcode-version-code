@@ -33,9 +33,7 @@ class VersionCode private constructor(
     }
 
     override fun compareTo(other: VersionCode): Int {
-        val idx = indexOfMostSignificantDifferentComponent(other)
-
-        return this.componentValue(idx) - other.componentValue(idx)
+        return compareByComponentValues(other)
     }
 
     override fun toString(): String {
@@ -61,14 +59,13 @@ class VersionCode private constructor(
         }
     }
 
-    private fun indexOfMostSignificantDifferentComponent(other: VersionCode): Int {
-        val lastIndex = max(this.components.lastIndex, other.components.lastIndex)
-        for (i in 0..lastIndex) {
-            val areComponentsDifferent = this.componentValue(i) != other.componentValue(i)
-            if (areComponentsDifferent || i == lastIndex) return i
-        }
+    private tailrec fun compareByComponentValues(other: VersionCode, idx: Int = 0): Int {
+        val lastIdx = max(components.lastIndex, other.components.lastIndex)
 
-        return lastIndex
+        if (idx == lastIdx || componentValue(idx) != other.componentValue(idx))
+            return componentValue(idx) - other.componentValue(idx)
+
+        return compareByComponentValues(other, idx.inc())
     }
 
     private fun componentValue(idx: Int): Int {
