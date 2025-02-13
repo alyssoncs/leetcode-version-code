@@ -2,6 +2,7 @@ package com.alyssoncirilo.versioncode
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrowWithMessage
+import io.kotest.matchers.collections.shouldHaveAtLeastSize
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -84,6 +85,22 @@ class SemanticVersionTest {
             @Test
             fun `major trumps over minor`() {
                 comparisonChecks(version.withMajor(2), ">", version.withMinor(20))
+            }
+        }
+
+        @Nested
+        inner class HashCode {
+            @Test
+            fun `should be well distributed`() {
+                val times = 10_000
+
+                val hashes = buildSet {
+                    repeat(times) { idx ->
+                        add(version.withMinor(idx).hashCode())
+                    }
+                }
+
+                hashes shouldHaveAtLeastSize (0.9 * times).toInt()
             }
         }
     }
