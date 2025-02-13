@@ -1,7 +1,6 @@
 package com.alyssoncirilo.versioncode
 
 import com.alyssoncirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
-import kotlin.math.max
 import kotlin.math.pow
 
 class VersionCode private constructor(
@@ -22,6 +21,12 @@ class VersionCode private constructor(
         }
     }
 
+    private val normalizedComponentValues: List<Int> by lazy {
+        val fixedLength = Int.SIZE_BITS - 1
+        val baseComponentValues = components.map { it.value }
+        baseComponentValues + List(fixedLength - baseComponentValues.size) { 0 }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (other !is VersionCode) return false
 
@@ -29,11 +34,14 @@ class VersionCode private constructor(
     }
 
     override fun hashCode(): Int {
-        return (components.map { it.value } + List(31 - components.size) { 0 }).hashCode()
+        return normalizedComponentValues.hashCode()
     }
 
     override fun compareTo(other: VersionCode): Int {
-        return compareByComponentValues(other)
+        return normalizedComponentValues.zip(other.normalizedComponentValues)
+            .firstOrNull { (a, b) -> a != b }
+            ?.let { (a, b) -> a - b }
+            ?: 0
     }
 
     override fun toString(): String {
@@ -57,19 +65,6 @@ class VersionCode private constructor(
 
             "${component.displayName} should $violation, but is ${component.value}"
         }
-    }
-
-    private tailrec fun compareByComponentValues(other: VersionCode, idx: Int = 0): Int {
-        val lastIdx = max(components.lastIndex, other.components.lastIndex)
-
-        if (idx == lastIdx || componentValue(idx) != other.componentValue(idx))
-            return componentValue(idx) - other.componentValue(idx)
-
-        return compareByComponentValues(other, idx.inc())
-    }
-
-    private fun componentValue(idx: Int): Int {
-        return this.components.getOrNull(idx)?.value ?: 0
     }
 
     private data class VersionComponent(
