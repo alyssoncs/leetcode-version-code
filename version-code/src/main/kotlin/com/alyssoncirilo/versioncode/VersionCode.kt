@@ -7,10 +7,6 @@ class VersionCode private constructor(
     private val components: List<VersionComponent>,
 ) : Comparable<VersionCode> {
 
-    init {
-        validate()
-    }
-
     val value: Int = run {
         val reversedComponents = components.reversed()
         val shifts = reversedComponents.scan(0) { acc, component ->
@@ -52,21 +48,6 @@ class VersionCode private constructor(
         return components.firstOrNull { it.displayName == component }?.value
     }
 
-    private fun validate() {
-        components.forEach(::checkVersionComponent)
-    }
-
-    private fun checkVersionComponent(component: VersionComponent) {
-        require(component.isValid(component.value)) {
-            val violation = if (component.value < 0)
-                "not be negative"
-            else
-                "be no more than ${component.maxValue} (2^${component.bits}-1)"
-
-            "${component.displayName} should $violation, but is ${component.value}"
-        }
-    }
-
     private data class VersionComponent(
         val displayName: String,
         val bits: Int,
@@ -74,7 +55,16 @@ class VersionCode private constructor(
     ) {
         val maxValue = (2 toThe bits) - 1
 
-        fun isValid(version: Int) = version in 0..maxValue
+        init {
+            require(value in 0..maxValue) {
+                val violation = if (value < 0)
+                    "not be negative"
+                else
+                    "be no more than $maxValue (2^$bits-1)"
+
+                "$displayName should $violation, but is $value"
+            }
+        }
 
         private infix fun Int.toThe(exponent: Int): Int {
             return toDouble().pow(exponent).toInt()
