@@ -56,14 +56,8 @@ class VersionCode private constructor(
         val maxValue = (2 toThe bits) - 1
 
         init {
-            require(value in 0..maxValue) {
-                val violation = if (value < 0)
-                    "not be negative"
-                else
-                    "be no more than $maxValue (2^$bits-1)"
-
-                "$displayName should $violation, but is $value"
-            }
+            require(value >= 0) { "$displayName should not be negative, but is $value" }
+            require(value <= maxValue) { "$displayName should be no more than $maxValue (2^$bits-1), but is $value" }
         }
 
         private infix fun Int.toThe(exponent: Int): Int {
