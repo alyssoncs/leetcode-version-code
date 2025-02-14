@@ -1,7 +1,6 @@
 package com.alyssoncirilo.versioncode
 
 import com.alyssoncirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
-import kotlin.math.pow
 
 class VersionCode private constructor(
     private val components: List<VersionComponent>,
@@ -53,15 +52,11 @@ class VersionCode private constructor(
         val bits: Int,
         val value: Int,
     ) {
-        val maxValue = (2 toThe bits) - 1
+        val maxValue = (2 shl (bits - 1)) - 1
 
         init {
             require(value >= 0) { "$displayName should not be negative, but is $value" }
             require(value <= maxValue) { "$displayName should be no more than $maxValue (2^$bits-1), but is $value" }
-        }
-
-        private infix fun Int.toThe(exponent: Int): Int {
-            return toDouble().pow(exponent).toInt()
         }
     }
 
