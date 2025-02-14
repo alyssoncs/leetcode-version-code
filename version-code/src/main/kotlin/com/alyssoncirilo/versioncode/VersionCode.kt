@@ -1,6 +1,7 @@
 package com.alyssoncirilo.versioncode
 
 import com.alyssoncirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
+import kotlin.math.max
 
 class VersionCode private constructor(
     private val components: List<VersionComponent>,
@@ -16,12 +17,6 @@ class VersionCode private constructor(
         }
     }
 
-    private val normalizedComponentValues: List<Int> by lazy {
-        val fixedLength = Int.SIZE_BITS - 1
-        val baseComponentValues = components.map { it.value }
-        baseComponentValues + List(fixedLength - baseComponentValues.size) { 0 }
-    }
-
     override fun equals(other: Any?): Boolean {
         if (other !is VersionCode) return false
 
@@ -29,13 +24,13 @@ class VersionCode private constructor(
     }
 
     override fun hashCode(): Int {
-        return normalizedComponentValues.hashCode()
+        return components.map { it.value }.hashCode()
     }
 
     override fun compareTo(other: VersionCode): Int {
-        return normalizedComponentValues.zip(other.normalizedComponentValues)
-            .firstOrNull { (a, b) -> a != b }
-            ?.let { (a, b) -> a - b }
+        return components.zip(other.components)
+            .firstOrNull { (a, b) -> a.value != b.value }
+            ?.let { (a, b) -> a.value - b.value }
             ?: 0
     }
 
@@ -44,7 +39,7 @@ class VersionCode private constructor(
     }
 
     operator fun get(component: String): Int? {
-        return components.firstOrNull { it.displayName == component }?.value
+        return components.firstOrNull { it.bits != 0 && it.displayName == component }?.value
     }
 
     private data class VersionComponent(
@@ -52,11 +47,18 @@ class VersionCode private constructor(
         val bits: Int,
         val value: Int,
     ) {
-        val maxValue = (2 shl (bits - 1)) - 1
+        val maxValue = run {
+            val shift = max(0, bits - 1)
+            (2 shl shift) - 1
+        }
 
         init {
             require(value >= 0) { "$displayName should not be negative, but is $value" }
             require(value <= maxValue) { "$displayName should be no more than $maxValue (2^$bits-1), but is $value" }
+        }
+
+        companion object {
+            val EMPTY = VersionComponent(displayName = "", bits = 0, value = 0)
         }
     }
 
@@ -81,7 +83,10 @@ class VersionCode private constructor(
                     value = component,
                 )
             }
-            return VersionCode(components)
+            val normalizedComponents = components + List((Int.SIZE_BITS - 1) - components.size) {
+                VersionComponent.EMPTY
+            }
+            return VersionCode(normalizedComponents)
         }
 
         private fun validateSchema() {
@@ -135,6 +140,10 @@ class VersionCode private constructor(
         }
 
         private fun validate() {
+            require(displayName.isNotBlank()) {
+                "No component should have blank name"
+            }
+
             require(bits.value >= 0) {
                 "No component should have negative size, but $displayName is ${bits.value}"
             }

@@ -125,6 +125,19 @@ class VersionCodeTest {
                 )
             }
         }
+
+        @ValueSource(strings = ["", " "])
+        @ParameterizedTest
+        fun `fail on blank component name`(componentName: String) {
+            shouldThrowWithMessage<IllegalArgumentException>(
+                "No component should have blank name",
+            ) {
+                VersionCode.Factory(
+                    "Major" takes 2.bits,
+                    componentName takes 4.bits,
+                )
+            }
+        }
     }
 
     @Nested
@@ -174,6 +187,21 @@ class VersionCodeTest {
             ) {
                 factory.create(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
             }
+        }
+    }
+
+    @Nested
+    inner class Retrieval {
+        @ValueSource(strings = ["build", "unknown", ""])
+        @ParameterizedTest
+        fun `should return null for unknown component`(componentName: String) {
+            val version = VersionCode.Factory(
+                "major" takes 4.bits,
+                "minor" takes 4.bits,
+                "patch" takes 4.bits,
+            ).create(1, 2, 3)
+
+            version[componentName] shouldBe null
         }
     }
 
