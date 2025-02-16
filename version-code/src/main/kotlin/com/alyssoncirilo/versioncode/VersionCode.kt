@@ -83,7 +83,7 @@ class VersionCode private constructor(
                     value = component,
                 )
             }
-            val normalizedComponents = components + List((Int.SIZE_BITS - 1) - components.size) {
+            val normalizedComponents = components + List(COMPONENTS_LIMIT - components.size) {
                 VersionComponent.EMPTY
             }
             return VersionCode(normalizedComponents)
@@ -95,8 +95,9 @@ class VersionCode private constructor(
             }
 
             val componentsTotalSize = schema.sumOf { it.bits.value }
-            require(componentsTotalSize < Int.SIZE_BITS) {
-                "All components combined should not take more than 31 bits, but total is $componentsTotalSize"
+            require(componentsTotalSize <= COMPONENTS_LIMIT) {
+                "All components combined should not take more than $COMPONENTS_LIMIT bits, " +
+                    "but total is $componentsTotalSize"
             }
 
             require(schema.size == schema.distinctBy { it.displayName }.size) {
@@ -131,6 +132,10 @@ class VersionCode private constructor(
                     missingComponents.dropLast(1).joinToString(separator = ", ") { it.displayName }
                 } and ${lastMissing.displayName}"
             }
+        }
+
+        companion object {
+            private const val COMPONENTS_LIMIT = Int.SIZE_BITS - 1
         }
     }
 
