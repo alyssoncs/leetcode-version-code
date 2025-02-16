@@ -47,7 +47,7 @@ class VersionCode private constructor(
         val bits: Int,
         val value: Int,
     ) {
-        val maxValue = run {
+        private val maxValue = run {
             val shift = max(0, bits - 1)
             (2 shl shift) - 1
         }
