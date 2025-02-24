@@ -1,7 +1,6 @@
 package com.alyssoncirilo.versioncode
 
 import com.alyssoncirilo.versioncode.VersionCode.ComponentSchema.Companion.takes
-import kotlin.math.max
 
 /**
  * Represents a version composed of several components.
@@ -329,8 +328,7 @@ class VersionCode private constructor(
         val value: Int,
     ) {
         private val maxValue = run {
-            val shift = max(0, bits - 1)
-            (2 shl shift) - 1
+            (1 shl bits) - 1
         }
 
         init {
