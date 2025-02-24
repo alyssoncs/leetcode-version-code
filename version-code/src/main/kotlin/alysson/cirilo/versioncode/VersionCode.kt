@@ -1,7 +1,5 @@
 package alysson.cirilo.versioncode
 
-import kotlin.math.pow
-
 class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<VersionCode> {
     init {
         VersionComponent.entries.forEach(::checkVersionComponent)
@@ -42,13 +40,9 @@ class VersionCode(val major: Int, val minor: Int, val patch: Int) : Comparable<V
 
         abstract fun from(version: VersionCode): Int
 
-        val maxValue = (2 toThe bits) - 1
+        val maxValue = (1 shl bits) - 1
 
         fun isValid(version: Int) = version in 0..maxValue
-
-        private infix fun Int.toThe(exponent: Int): Int {
-            return toDouble().pow(exponent).toInt()
-        }
     }
 
     companion object {
