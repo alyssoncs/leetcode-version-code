@@ -8,3 +8,5 @@ dependencies {
     implementation(libs.dependencies.sorter.gradle.plugin)
     implementation(libs.dependency.analysis.gradle.plugin)
 }
+
+kotlin.jvmToolchain(libs.versions.java.get().toInt())
